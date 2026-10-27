@@ -62,6 +62,10 @@ export const firestoreService = {
         senderId,
         text,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        isEdited: false,
+        editedAt: null,
+        isDeleted: false,
+        deletedAt: null,
         readBy: {
           [senderId]: now,
         },
@@ -75,6 +79,10 @@ export const firestoreService = {
         senderId,
         text,
         createdAt: now,
+        isEdited: false,
+        editedAt: null,
+        isDeleted: false,
+        deletedAt: null,
         readBy: { [senderId]: now },
       };
     }
@@ -90,11 +98,124 @@ export const firestoreService = {
       senderId,
       text,
       createdAt: now,
+      isEdited: false,
+      editedAt: null,
+      isDeleted: false,
+      deletedAt: null,
       readBy: { [senderId]: now },
     };
 
     memoryStore.messages.get(chatId)!.set(messageId, message);
     return message;
+  },
+
+  async getMessage(chatId: string, messageId: string): Promise<MessageDocument | null> {
+    if (firestoreDb) {
+      const doc = await firestoreDb
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .doc(messageId)
+        .get();
+
+      if (!doc.exists) return null;
+      const data = doc.data()!;
+      let createdAt = new Date().toISOString();
+      if (data.createdAt && typeof data.createdAt.toDate === "function") {
+        createdAt = data.createdAt.toDate().toISOString();
+      } else if (typeof data.createdAt === "string") {
+        createdAt = data.createdAt;
+      }
+
+      let editedAt: string | null = null;
+      if (data.editedAt && typeof data.editedAt.toDate === "function") {
+        editedAt = data.editedAt.toDate().toISOString();
+      } else if (typeof data.editedAt === "string") {
+        editedAt = data.editedAt;
+      }
+
+      let deletedAt: string | null = null;
+      if (data.deletedAt && typeof data.deletedAt.toDate === "function") {
+        deletedAt = data.deletedAt.toDate().toISOString();
+      } else if (typeof data.deletedAt === "string") {
+        deletedAt = data.deletedAt;
+      }
+
+      return {
+        id: doc.id,
+        chatId: data.chatId || chatId,
+        senderId: data.senderId,
+        text: data.text,
+        createdAt,
+        isEdited: Boolean(data.isEdited),
+        editedAt,
+        isDeleted: Boolean(data.isDeleted),
+        deletedAt,
+        readBy: data.readBy || {},
+      };
+    }
+
+    const chatMessages = memoryStore.messages.get(chatId);
+    return chatMessages?.get(messageId) || null;
+  },
+
+  async editMessage(chatId: string, messageId: string, text: string): Promise<MessageDocument> {
+    const now = new Date().toISOString();
+
+    if (firestoreDb) {
+      const docRef = firestoreDb
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .doc(messageId);
+
+      await docRef.update({
+        text,
+        isEdited: true,
+        editedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      const updated = await this.getMessage(chatId, messageId);
+      return updated!;
+    }
+
+    const chatMessages = memoryStore.messages.get(chatId);
+    const msg = chatMessages?.get(messageId);
+    if (!msg) {
+      throw new Error("Message not found");
+    }
+
+    msg.text = text;
+    msg.isEdited = true;
+    msg.editedAt = now;
+    return { ...msg };
+  },
+
+  async deleteMessage(chatId: string, messageId: string): Promise<void> {
+    const now = new Date().toISOString();
+
+    if (firestoreDb) {
+      const docRef = firestoreDb
+        .collection("chats")
+        .doc(chatId)
+        .collection("messages")
+        .doc(messageId);
+
+      await docRef.update({
+        text: "This message was deleted",
+        isDeleted: true,
+        deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      return;
+    }
+
+    const chatMessages = memoryStore.messages.get(chatId);
+    const msg = chatMessages?.get(messageId);
+    if (msg) {
+      msg.text = "This message was deleted";
+      msg.isDeleted = true;
+      msg.deletedAt = now;
+    }
   },
 
   async getMessages(chatId: string, limitCount = 50): Promise<MessageDocument[]> {
@@ -116,12 +237,30 @@ export const firestoreService = {
           createdAt = data.createdAt;
         }
 
+        let editedAt: string | null = null;
+        if (data.editedAt && typeof data.editedAt.toDate === "function") {
+          editedAt = data.editedAt.toDate().toISOString();
+        } else if (typeof data.editedAt === "string") {
+          editedAt = data.editedAt;
+        }
+
+        let deletedAt: string | null = null;
+        if (data.deletedAt && typeof data.deletedAt.toDate === "function") {
+          deletedAt = data.deletedAt.toDate().toISOString();
+        } else if (typeof data.deletedAt === "string") {
+          deletedAt = data.deletedAt;
+        }
+
         return {
           id: doc.id,
           chatId: data.chatId || chatId,
           senderId: data.senderId,
           text: data.text,
           createdAt,
+          isEdited: Boolean(data.isEdited),
+          editedAt,
+          isDeleted: Boolean(data.isDeleted),
+          deletedAt,
           readBy: data.readBy || {},
         };
       });
