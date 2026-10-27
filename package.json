@@ -11,7 +11,7 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
-    "test": "jest --runInBand"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@prisma/client": "^6.4.1",

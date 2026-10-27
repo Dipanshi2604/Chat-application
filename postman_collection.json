@@ -1,0 +1,250 @@
+{
+  "info": {
+    "name": "Chat Backend API",
+    "description": "Collection for testing all Chat Backend endpoints (Core + Bonus)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Create or Get 1:1 Chat",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userAId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\",\n  \"userBId\": \"b34a2955-1c25-435f-bedc-072cdbf52412\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/create",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", "create"]
+        }
+      }
+    },
+    {
+      "name": "2. Send Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"senderId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\",\n  \"text\": \"Hello Bob, how are you?\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/message/send",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "message", "send"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_CHAT_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Get Messages",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/messages?limit=50",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "messages"],
+          "query": [
+            { "key": "limit", "value": "50" }
+          ],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_CHAT_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Mark Message Read",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"b34a2955-1c25-435f-bedc-072cdbf52412\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/message/:messageId/read",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "message", ":messageId", "read"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_CHAT_ID>" },
+            { "key": "messageId", "value": "<REPLACE_WITH_MESSAGE_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Update Last Seen Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"b34a2955-1c25-435f-bedc-072cdbf52412\",\n  \"messageId\": \"<REPLACE_WITH_MESSAGE_ID>\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/lastseen",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "lastseen"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_CHAT_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. List User Chats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/user/:userId/chats",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["user", ":userId", "chats"],
+          "variable": [
+            { "key": "userId", "value": "85a56e63-24fa-4c5b-8fc3-760ecf81b3bf" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Group Chat",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Engineering Team\",\n  \"adminId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\",\n  \"memberIds\": [\"b34a2955-1c25-435f-bedc-072cdbf52412\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/group/create",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", "group", "create"]
+        }
+      }
+    },
+    {
+      "name": "Add Member to Group",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requestingUserId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\",\n  \"userId\": \"eda22b71-e9c9-4910-a898-0e081270b503\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/members/add",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "members", "add"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_GROUP_CHAT_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Remove Member from Group",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requestingUserId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\",\n  \"userId\": \"eda22b71-e9c9-4910-a898-0e081270b503\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/members/remove",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "members", "remove"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_GROUP_CHAT_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Edit Message",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\",\n  \"text\": \"Updated text from Alice\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/message/:messageId",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "message", ":messageId"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_CHAT_ID>" },
+            { "key": "messageId", "value": "<REPLACE_WITH_MESSAGE_ID>" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Message",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"85a56e63-24fa-4c5b-8fc3-760ecf81b3bf\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/chat/:chatId/message/:messageId",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "4000",
+          "path": ["chat", ":chatId", "message", ":messageId"],
+          "variable": [
+            { "key": "chatId", "value": "<REPLACE_WITH_CHAT_ID>" },
+            { "key": "messageId", "value": "<REPLACE_WITH_MESSAGE_ID>" }
+          ]
+        }
+      }
+    }
+  ]
+}

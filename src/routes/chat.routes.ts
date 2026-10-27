@@ -28,7 +28,7 @@ router.post(
   }
 );
 
-// Bonus: Create Group Chat
+// Create Group Chat
 const createGroupSchema = z.object({
   body: z.object({
     title: z.string().min(1, "title is required"),
@@ -51,7 +51,7 @@ router.post(
   }
 );
 
-// Bonus: Add Group Member
+// Add Group Member
 const addMemberSchema = z.object({
   params: z.object({
     chatId: z.string().min(1),
@@ -77,7 +77,7 @@ router.post(
   }
 );
 
-// Bonus: Remove Group Member
+// Remove Group Member
 const removeMemberSchema = z.object({
   params: z.object({
     chatId: z.string().min(1),
@@ -129,7 +129,7 @@ router.post(
   }
 );
 
-// Bonus: Edit Message
+// Edit Message
 const editMessageSchema = z.object({
   params: z.object({
     chatId: z.string().min(1),
@@ -157,7 +157,7 @@ router.patch(
   }
 );
 
-// Bonus: Delete Message
+// Delete Message
 const deleteMessageSchema = z.object({
   params: z.object({
     chatId: z.string().min(1),
