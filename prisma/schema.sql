@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS "users" (
+    "id" TEXT NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+    "email" TEXT NOT NULL UNIQUE,
+    "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "chats" (
+    "id" TEXT NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+    "isGroup" BOOLEAN NOT NULL DEFAULT false,
+    "title" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "chat_members" (
+    "id" TEXT NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+    "chatId" TEXT NOT NULL REFERENCES "chats"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "userId" TEXT NOT NULL REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    "role" TEXT NOT NULL DEFAULT 'MEMBER',
+    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "chat_members_chatId_userId_key" UNIQUE ("chatId", "userId")
+);
+
+CREATE INDEX IF NOT EXISTS "chat_members_userId_idx" ON "chat_members"("userId");
+
+-- Migrations for existing tables
+ALTER TABLE "chats" ADD COLUMN IF NOT EXISTS "isGroup" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "chats" ADD COLUMN IF NOT EXISTS "title" TEXT;
+ALTER TABLE "chat_members" ADD COLUMN IF NOT EXISTS "role" TEXT NOT NULL DEFAULT 'MEMBER';

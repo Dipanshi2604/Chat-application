@@ -1,0 +1,45 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  name      String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  memberships ChatMember[]
+
+  @@map("users")
+}
+
+model Chat {
+  id        String       @id @default(uuid())
+  isGroup   Boolean      @default(false)
+  title     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  members   ChatMember[]
+
+  @@map("chats")
+}
+
+model ChatMember {
+  id       String   @id @default(uuid())
+  chatId   String
+  userId   String
+  role     String   @default("MEMBER") // "ADMIN" | "MEMBER"
+  joinedAt DateTime @default(now())
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@index([userId])
+  @@map("chat_members")
+}
